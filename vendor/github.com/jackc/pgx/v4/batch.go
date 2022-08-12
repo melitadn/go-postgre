@@ -2,10 +2,9 @@ package pgx
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
 	"github.com/jackc/pgconn"
+	errors "golang.org/x/xerrors"
 )
 
 type batchItem struct {
@@ -42,32 +41,25 @@ type BatchResults interface {
 	// QueryRow reads the results from the next query in the batch as if the query has been sent with Conn.QueryRow.
 	QueryRow() Row
 
-	// QueryFunc reads the results from the next query in the batch as if the query has been sent with Conn.QueryFunc.
-	QueryFunc(scans []interface{}, f func(QueryFuncRow) error) (pgconn.CommandTag, error)
-
 	// Close closes the batch operation. This must be called before the underlying connection can be used again. Any error
 	// that occurred during a batch operation may have made it impossible to resyncronize the connection with the server.
-	// In this case the underlying connection will have been closed. Close is safe to call multiple times.
+	// In this case the underlying connection will have been closed.
 	Close() error
 }
 
 type batchResults struct {
-	ctx    context.Context
-	conn   *Conn
-	mrr    *pgconn.MultiResultReader
-	err    error
-	b      *Batch
-	ix     int
-	closed bool
+	ctx  context.Context
+	conn *Conn
+	mrr  *pgconn.MultiResultReader
+	err  error
+	b    *Batch
+	ix   int
 }
 
 // Exec reads the results from the next query in the batch as if the query has been sent with Exec.
 func (br *batchResults) Exec() (pgconn.CommandTag, error) {
 	if br.err != nil {
 		return nil, br.err
-	}
-	if br.closed {
-		return nil, fmt.Errorf("batch already closed")
 	}
 
 	query, arguments, _ := br.nextQueryAndArgs()
@@ -78,10 +70,10 @@ func (br *batchResults) Exec() (pgconn.CommandTag, error) {
 			err = errors.New("no result")
 		}
 		if br.conn.shouldLog(LogLevelError) {
-			br.conn.log(br.ctx, LogLevelError, "BatchResult.Exec", map[string]interface{}{
-				"sql":  query,
+			br.conn.log(br.ctx, LogLevelError, "BatchResult.Exec", map[string]interface{} {
+				"sql": query,
 				"args": logQueryArgs(arguments),
-				"err":  err,
+				"err": err,
 			})
 		}
 		return nil, err
@@ -98,9 +90,9 @@ func (br *batchResults) Exec() (pgconn.CommandTag, error) {
 			})
 		}
 	} else if br.conn.shouldLog(LogLevelInfo) {
-		br.conn.log(br.ctx, LogLevelInfo, "BatchResult.Exec", map[string]interface{}{
-			"sql":        query,
-			"args":       logQueryArgs(arguments),
+		br.conn.log(br.ctx, LogLevelInfo, "BatchResult.Exec", map[string]interface{} {
+			"sql": query,
+			"args": logQueryArgs(arguments),
 			"commandTag": commandTag,
 		})
 	}
@@ -115,16 +107,13 @@ func (br *batchResults) Query() (Rows, error) {
 		query = "batch query"
 	}
 
-	if br.err != nil {
-		return &connRows{err: br.err, closed: true}, br.err
-	}
-
-	if br.closed {
-		alreadyClosedErr := fmt.Errorf("batch already closed")
-		return &connRows{err: alreadyClosedErr, closed: true}, alreadyClosedErr
-	}
-
 	rows := br.conn.getRows(br.ctx, query, arguments)
+
+	if br.err != nil {
+		rows.err = br.err
+		rows.closed = true
+		return rows, br.err
+	}
 
 	if !br.mrr.NextResult() {
 		rows.err = br.mrr.Close()
@@ -134,10 +123,10 @@ func (br *batchResults) Query() (Rows, error) {
 		rows.closed = true
 
 		if br.conn.shouldLog(LogLevelError) {
-			br.conn.log(br.ctx, LogLevelError, "BatchResult.Query", map[string]interface{}{
-				"sql":  query,
+			br.conn.log(br.ctx, LogLevelError, "BatchResult.Query", map[string]interface{} {
+				"sql": query,
 				"args": logQueryArgs(arguments),
-				"err":  rows.err,
+				"err": rows.err,
 			})
 		}
 
@@ -146,37 +135,6 @@ func (br *batchResults) Query() (Rows, error) {
 
 	rows.resultReader = br.mrr.ResultReader()
 	return rows, nil
-}
-
-// QueryFunc reads the results from the next query in the batch as if the query has been sent with Conn.QueryFunc.
-func (br *batchResults) QueryFunc(scans []interface{}, f func(QueryFuncRow) error) (pgconn.CommandTag, error) {
-	if br.closed {
-		return nil, fmt.Errorf("batch already closed")
-	}
-
-	rows, err := br.Query()
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(scans...)
-		if err != nil {
-			return nil, err
-		}
-
-		err = f(rows)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return rows.CommandTag(), nil
 }
 
 // QueryRow reads the results from the next query in the batch as if the query has been sent with QueryRow.
@@ -193,11 +151,6 @@ func (br *batchResults) Close() error {
 		return br.err
 	}
 
-	if br.closed {
-		return nil
-	}
-	br.closed = true
-
 	// log any queries that haven't yet been logged by Exec or Query
 	for {
 		query, args, ok := br.nextQueryAndArgs()
@@ -206,8 +159,8 @@ func (br *batchResults) Close() error {
 		}
 
 		if br.conn.shouldLog(LogLevelInfo) {
-			br.conn.log(br.ctx, LogLevelInfo, "BatchResult.Close", map[string]interface{}{
-				"sql":  query,
+			br.conn.log(br.ctx, LogLevelInfo, "BatchResult.Close", map[string]interface{} {
+				"sql": query,
 				"args": logQueryArgs(args),
 			})
 		}

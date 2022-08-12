@@ -64,31 +64,6 @@ func (src SASLInitialResponse) MarshalJSON() ([]byte, error) {
 	}{
 		Type:          "SASLInitialResponse",
 		AuthMechanism: src.AuthMechanism,
-		Data:          string(src.Data),
+		Data:          hex.EncodeToString(src.Data),
 	})
-}
-
-// UnmarshalJSON implements encoding/json.Unmarshaler.
-func (dst *SASLInitialResponse) UnmarshalJSON(data []byte) error {
-	// Ignore null, like in the main JSON package.
-	if string(data) == "null" {
-		return nil
-	}
-
-	var msg struct {
-		AuthMechanism string
-		Data          string
-	}
-	if err := json.Unmarshal(data, &msg); err != nil {
-		return err
-	}
-	dst.AuthMechanism = msg.AuthMechanism
-	if msg.Data != "" {
-		decoded, err := hex.DecodeString(msg.Data)
-		if err != nil {
-			return err
-		}
-		dst.Data = decoded
-	}
-	return nil
 }
