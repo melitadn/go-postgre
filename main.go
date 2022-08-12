@@ -149,5 +149,5 @@ func main() {
 	}
 	app := fiber.New()
 	r.SetupRoutes(app)
-	app.Listen(":8081")
+	app.Listen(os.Getenv("ADDR"))
 }
