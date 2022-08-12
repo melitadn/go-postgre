@@ -67,12 +67,6 @@ func (expr Expr) Build(builder Builder) {
 			builder.WriteByte(v)
 		}
 	}
-
-	if idx < len(expr.Vars) {
-		for _, v := range expr.Vars[idx:] {
-			builder.AddVar(builder, sql.NamedArg{Value: v})
-		}
-	}
 }
 
 // NamedExpr raw expression for named expr
@@ -127,7 +121,7 @@ func (expr NamedExpr) Build(builder Builder) {
 		if v == '@' && !inName {
 			inName = true
 			name = []byte{}
-		} else if v == ' ' || v == ',' || v == ')' || v == '"' || v == '\'' || v == '`' || v == '\r' || v == '\n' || v == ';' {
+		} else if v == ' ' || v == ',' || v == ')' || v == '"' || v == '\'' || v == '`' || v == '\n' {
 			if inName {
 				if nv, ok := namedMap[string(name)]; ok {
 					builder.AddVar(builder, nv)
@@ -179,12 +173,7 @@ func (expr NamedExpr) Build(builder Builder) {
 	}
 
 	if inName {
-		if nv, ok := namedMap[string(name)]; ok {
-			builder.AddVar(builder, nv)
-		} else {
-			builder.WriteByte('@')
-			builder.WriteString(string(name))
-		}
+		builder.AddVar(builder, namedMap[string(name)])
 	}
 }
 
@@ -216,12 +205,11 @@ func (in IN) Build(builder Builder) {
 }
 
 func (in IN) NegationBuild(builder Builder) {
-	builder.WriteQuoted(in.Column)
 	switch len(in.Values) {
 	case 0:
-		builder.WriteString(" IS NOT NULL")
 	case 1:
 		if _, ok := in.Values[0].([]interface{}); !ok {
+			builder.WriteQuoted(in.Column)
 			builder.WriteString(" <> ")
 			builder.AddVar(builder, in.Values[0])
 			break
@@ -229,6 +217,7 @@ func (in IN) NegationBuild(builder Builder) {
 
 		fallthrough
 	default:
+		builder.WriteQuoted(in.Column)
 		builder.WriteString(" NOT IN (")
 		builder.AddVar(builder, in.Values...)
 		builder.WriteByte(')')
@@ -244,24 +233,11 @@ type Eq struct {
 func (eq Eq) Build(builder Builder) {
 	builder.WriteQuoted(eq.Column)
 
-	switch eq.Value.(type) {
-	case []string, []int, []int32, []int64, []uint, []uint32, []uint64, []interface{}:
-		builder.WriteString(" IN (")
-		rv := reflect.ValueOf(eq.Value)
-		for i := 0; i < rv.Len(); i++ {
-			if i > 0 {
-				builder.WriteByte(',')
-			}
-			builder.AddVar(builder, rv.Index(i).Interface())
-		}
-		builder.WriteByte(')')
-	default:
-		if eqNil(eq.Value) {
-			builder.WriteString(" IS NULL")
-		} else {
-			builder.WriteString(" = ")
-			builder.AddVar(builder, eq.Value)
-		}
+	if eqNil(eq.Value) {
+		builder.WriteString(" IS NULL")
+	} else {
+		builder.WriteString(" = ")
+		builder.AddVar(builder, eq.Value)
 	}
 }
 
@@ -275,24 +251,11 @@ type Neq Eq
 func (neq Neq) Build(builder Builder) {
 	builder.WriteQuoted(neq.Column)
 
-	switch neq.Value.(type) {
-	case []string, []int, []int32, []int64, []uint, []uint32, []uint64, []interface{}:
-		builder.WriteString(" NOT IN (")
-		rv := reflect.ValueOf(neq.Value)
-		for i := 0; i < rv.Len(); i++ {
-			if i > 0 {
-				builder.WriteByte(',')
-			}
-			builder.AddVar(builder, rv.Index(i).Interface())
-		}
-		builder.WriteByte(')')
-	default:
-		if eqNil(neq.Value) {
-			builder.WriteString(" IS NOT NULL")
-		} else {
-			builder.WriteString(" <> ")
-			builder.AddVar(builder, neq.Value)
-		}
+	if eqNil(neq.Value) {
+		builder.WriteString(" IS NOT NULL")
+	} else {
+		builder.WriteString(" <> ")
+		builder.AddVar(builder, neq.Value)
 	}
 }
 
@@ -368,7 +331,7 @@ func (like Like) NegationBuild(builder Builder) {
 }
 
 func eqNil(value interface{}) bool {
-	if valuer, ok := value.(driver.Valuer); ok && !eqNilReflect(valuer) {
+	if valuer, ok := value.(driver.Valuer); ok {
 		value, _ = valuer.Value()
 	}
 

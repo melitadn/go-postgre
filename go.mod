@@ -1,31 +1,29 @@
-module github.com/melitadn/go-postgre
+module github.com/ydhnwb/golang_heroku
 
-go 1.18
-
-require (
-	github.com/gofiber/fiber/v2 v2.36.0
-	github.com/joho/godotenv v1.4.0
-	gorm.io/driver/postgres v1.3.8
-	gorm.io/gorm v1.23.8
-)
+// +heroku goVersion go1.15
+go 1.15
 
 require (
-	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgconn v1.12.1 // indirect
-	github.com/jackc/pgio v1.0.0 // indirect
-	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.3.0 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
-	github.com/jackc/pgtype v1.11.0 // indirect
-	github.com/jackc/pgx/v4 v4.16.1 // indirect
-	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.4 // indirect
-	github.com/klauspost/compress v1.15.0 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.38.0 // indirect
-	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
-	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-gonic/gin v1.7.1
+	github.com/go-playground/validator v9.31.0+incompatible // indirect
+	github.com/go-playground/validator/v10 v10.5.0 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/joho/godotenv v1.3.0
+	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/mashingan/smapping v0.1.6
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/ugorji/go v1.2.5 // indirect
+	golang.org/x/crypto v0.0.0-20210415154028-4f45737414dc
+	golang.org/x/sys v0.0.0-20210415045647-66c3f260301c // indirect
+	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	google.golang.org/genproto v0.0.0-20210416161957-9910b6c460de
+	google.golang.org/protobuf v1.26.0
+	gopkg.in/go-playground/validator.v9 v9.31.0
+	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gorm.io/driver/postgres v1.0.8
+	gorm.io/gorm v1.21.8
 )

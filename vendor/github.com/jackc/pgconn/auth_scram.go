@@ -18,13 +18,13 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"strconv"
 
 	"github.com/jackc/pgproto3/v2"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/text/secure/precis"
+	errors "golang.org/x/xerrors"
 )
 
 const clientNonceLen = 18
@@ -78,14 +78,12 @@ func (c *PgConn) rxSASLContinue() (*pgproto3.AuthenticationSASLContinue, error) 
 	if err != nil {
 		return nil, err
 	}
-	switch m := msg.(type) {
-	case *pgproto3.AuthenticationSASLContinue:
-		return m, nil
-	case *pgproto3.ErrorResponse:
-		return nil, ErrorResponseToPgError(m)
+	saslContinue, ok := msg.(*pgproto3.AuthenticationSASLContinue)
+	if ok {
+		return saslContinue, nil
 	}
 
-	return nil, fmt.Errorf("expected AuthenticationSASLContinue message but received unexpected message %T", msg)
+	return nil, errors.New("expected AuthenticationSASLContinue message but received unexpected message")
 }
 
 func (c *PgConn) rxSASLFinal() (*pgproto3.AuthenticationSASLFinal, error) {
@@ -93,14 +91,12 @@ func (c *PgConn) rxSASLFinal() (*pgproto3.AuthenticationSASLFinal, error) {
 	if err != nil {
 		return nil, err
 	}
-	switch m := msg.(type) {
-	case *pgproto3.AuthenticationSASLFinal:
-		return m, nil
-	case *pgproto3.ErrorResponse:
-		return nil, ErrorResponseToPgError(m)
+	saslFinal, ok := msg.(*pgproto3.AuthenticationSASLFinal)
+	if ok {
+		return saslFinal, nil
 	}
 
-	return nil, fmt.Errorf("expected AuthenticationSASLFinal message but received unexpected message %T", msg)
+	return nil, errors.New("expected AuthenticationSASLFinal message but received unexpected message")
 }
 
 type scramClient struct {
@@ -196,12 +192,12 @@ func (sc *scramClient) recvServerFirstMessage(serverFirstMessage []byte) error {
 	var err error
 	sc.salt, err = base64.StdEncoding.DecodeString(string(saltStr))
 	if err != nil {
-		return fmt.Errorf("invalid SCRAM salt received from server: %w", err)
+		return errors.Errorf("invalid SCRAM salt received from server: %w", err)
 	}
 
 	sc.iterations, err = strconv.Atoi(string(iterationsStr))
 	if err != nil || sc.iterations <= 0 {
-		return fmt.Errorf("invalid SCRAM iteration count received from server: %w", err)
+		return errors.Errorf("invalid SCRAM iteration count received from server: %w", err)
 	}
 
 	if !bytes.HasPrefix(sc.clientAndServerNonce, sc.clientNonce) {
