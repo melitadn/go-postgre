@@ -1,1 +1,1 @@
-web: golang_heroku
+web: go-postgre
