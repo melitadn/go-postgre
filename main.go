@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ydhnwb/golang_heroku/config"
-	v1 "github.com/ydhnwb/golang_heroku/handler/v1"
-	"github.com/ydhnwb/golang_heroku/middleware"
-	"github.com/ydhnwb/golang_heroku/repo"
-	"github.com/ydhnwb/golang_heroku/service"
+	"github.com/melitadn/go-postgre/config"
+	v1 "github.com/melitadn/go-postgre/handler/v1"
+	"github.com/melitadn/go-postgre/middleware"
+	"github.com/melitadn/go-postgre/repo"
+	"github.com/melitadn/go-postgre/service"
 	"gorm.io/gorm"
 )
 

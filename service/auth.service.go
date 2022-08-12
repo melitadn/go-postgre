@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/ydhnwb/golang_heroku/repo"
+	"github.com/melitadn/go-postgre/repo"
 	"golang.org/x/crypto/bcrypt"
 )
 

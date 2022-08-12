@@ -1,8 +1,8 @@
 package _product
 
 import (
-	"github.com/ydhnwb/golang_heroku/entity"
-	_user "github.com/ydhnwb/golang_heroku/service/user"
+	"github.com/melitadn/go-postgre/entity"
+	_user "github.com/melitadn/go-postgre/service/user"
 )
 
 type ProductResponse struct {

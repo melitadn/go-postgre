@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"github.com/ydhnwb/golang_heroku/entity"
+	"github.com/melitadn/go-postgre/entity"
 	"gorm.io/gorm"
 )
 

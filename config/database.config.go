@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ydhnwb/golang_heroku/entity"
+	"github.com/melitadn/go-postgre/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

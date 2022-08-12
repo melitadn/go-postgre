@@ -7,10 +7,10 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/ydhnwb/golang_heroku/common/obj"
-	"github.com/ydhnwb/golang_heroku/common/response"
-	"github.com/ydhnwb/golang_heroku/dto"
-	"github.com/ydhnwb/golang_heroku/service"
+	"github.com/melitadn/go-postgre/common/obj"
+	"github.com/melitadn/go-postgre/common/response"
+	"github.com/melitadn/go-postgre/dto"
+	"github.com/melitadn/go-postgre/service"
 )
 
 type ProductHandler interface {

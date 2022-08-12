@@ -3,7 +3,7 @@ package repo
 import (
 	"log"
 
-	"github.com/ydhnwb/golang_heroku/entity"
+	"github.com/melitadn/go-postgre/entity"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

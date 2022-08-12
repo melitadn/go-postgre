@@ -1,6 +1,7 @@
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?style=plastic)](./LICENSE)
 [![CircleCI](https://circleci.com/gh/mashingan/smapping.svg?style=svg)](https://circleci.com/gh/mashingan/smapping)
 [![GoDoc](https://godoc.org/github.com/mashingan/smapping?status.svg)](https://godoc.org/github.com/mashingan/smapping)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mashingan/smapping)](https://goreportcard.com/report/github.com/mashingan/smapping)
 
 # smapping
 Golang structs generic mapping.
@@ -76,6 +77,10 @@ internal state so each operation is transparent and *almost* functional
 returning the new struct itself, but this is only trade-off because Golang
 doesn't have type-parameter which known as generic).
 
+Since `v0.1.10`, we added the [`MapEncoder`](smapping.go#L21) and
+[`MapDecoder`](smapping.go#L27) interfaces for users to have custom conversion
+for custom and self-defined struct.
+
 ## Install
 ```
 go get github.com/mashingan/smapping
@@ -132,7 +137,7 @@ func main() {
 		Version: 1,
 	}
 	fmt.Println("source:", source)
-	mapped := smapping.MapFields(&source)
+	mapped := smapping.MapFields(source)
 	fmt.Println("mapped:", mapped)
 	sink := Sink{}
 	err := smapping.FillStruct(&sink, mapped)
@@ -141,7 +146,7 @@ func main() {
 	}
 	fmt.Println("sink:", sink)
 
-	maptags := smapping.MapTags(&source, "json")
+	maptags := smapping.MapTags(source, "json")
 	fmt.Println("maptags:", maptags)
 	hereticsink := HereticSink{}
 	err = smapping.FillStructByTags(&hereticsink, maptags, "json")
@@ -161,7 +166,7 @@ func main() {
 
 	// What we want actually "internal" instead of "private" field
 	// we use the api tags on to make the json
-	apijson, _ := json.Marshal(smapping.MapTagsWithDefault(&dof, "api", "json"))
+	apijson, _ := json.Marshal(smapping.MapTagsWithDefault(dof, "api", "json"))
 	fmt.Println("api marshal:", string(apijson))
 
 	fmt.Println("=============")
@@ -232,10 +237,10 @@ func main() {
 	var err error
 	testByTags := true
 	if testByTags {
-		madnestMap := smapping.MapTags(&madnestStruct, "json")
+		madnestMap := smapping.MapTags(madnestStruct, "json")
 		err = smapping.FillStructByTags(&madnestObj, madnestMap, "json")
 	} else {
-		madnestMap := smapping.MapFields(&madnestStruct)
+		madnestMap := smapping.MapFields(madnestStruct)
 		err = smapping.FillStruct(&madnestObj)
 	}
 	if err != nil {

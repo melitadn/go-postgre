@@ -6,8 +6,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/ydhnwb/golang_heroku/common/response"
-	"github.com/ydhnwb/golang_heroku/service"
+	"github.com/melitadn/go-postgre/common/response"
+	"github.com/melitadn/go-postgre/service"
 )
 
 //AuthorizeJWT validates the token user given, return 401 if not valid
