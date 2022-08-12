@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	fiber "github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 	"github.com/melitadn/go-postgre/models"
 	"github.com/melitadn/go-postgre/storage"
 	"gorm.io/gorm"
@@ -121,10 +120,10 @@ func (r *Repository) SetupRoutes(app *fiber.App) {
 }
 
 func main() {
-	err := godotenv.Load("config.env")
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err := godotenv.Load("config.env")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	config := &storage.Config{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
