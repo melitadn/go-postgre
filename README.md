@@ -1,12 +1,7 @@
 # golang heroku deploy
 This is a simple restful api project that deployed to heroku. You can access it with this url:  
 ```
-https://golang-heroku.herokuapp.com
-```
-
-Find the tutorial here:
-```
-https://www.youtube.com/watch?v=_EAkLIoMCNM
+https://go-deploy-testing.herokuapp.com/
 ```
 
 # Documentation
@@ -15,7 +10,7 @@ to check current server is alive:
 
 <b>GET</b>
 ```
-https://golang-heroku.herokuapp.com/api/check/health
+https://go-deploy-testing.herokuapp.com/api/check/health
 ```
   
 Response (Status: 200)
@@ -30,15 +25,15 @@ Registering a new user
 
 <b>POST</b>
 ```
-https://golang-heroku.herokuapp.com/api/auth/register
+https://go-deploy-testing.herokuapp.com/api/auth/register
 ```
 
 Request Body
 ```
 {
-    "name": "Prieyudha Akadita S",
-    "email": "ydhnwb@gmail.com",
-    "password": "yudhanewbie"
+    "name": "meli",
+    "email": "meli@gmail.com",
+    "password": "12345678"
 }
 ```
 
